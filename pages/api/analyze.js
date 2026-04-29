@@ -13,14 +13,15 @@ export default async function handler(req, res) {
         messages: [
           {
             role: "system",
-            content: "أنت أداة MiniCode لتحليل التصوير بشكل احترافي"
+            content: "أنت أداة MiniCode لتحليل النصوص بشكل احترافي"
           },
           {
             role: "user",
             content: prompt
           }
         ],
-        temperature: 0.7
+        temperature: 0.7,
+        max_tokens: 1000
       })
     });
 
