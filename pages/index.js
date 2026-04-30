@@ -1,15 +1,15 @@
 import { useState, useRef } from 'react';
 import Head from 'next/head';
 
-const MSGS = ['ظٹظپظƒط± ط§ظ„ظ…ط®ط±ط¬...','ظٹط­ظ„ظ„ ط§ظ„ط¬ظ…ط§ظ„ظٹط§طھ...','ظٹط¨ظ†ظٹ ط§ظ„ظ€ shot list...','ظٹط®طھط§ط± ط§ظ„ظ…ط±ط§ط¬ط¹...','ظٹط±ط³ظ… ط§ظ„ظ€ palette...'];
+const MSGS = ['Thinking...','Analyzing aesthetics...','Building shot list...','Selecting references...','Drawing palette...'];
 
 export default function Home() {
-  const [field, setField] = useState('طھطµظˆظٹط± ظپظˆطھظˆط؛ط±ط§ظپظٹ');
-  const [style, setStyle] = useState('ط³ظٹظ†ظ…ط§ط¦ظٹ ط¯ط§ظƒظ†');
-  const [location, setLocation] = useState('ط§ظ„ط±ظٹط§ط¶');
+  const [field, setField] = useState('Photography');
+  const [style, setStyle] = useState('Cinematic Dark');
+  const [location, setLocation] = useState('Riyadh');
   const [topic, setTopic] = useState('');
   const [audience, setAudience] = useState('');
-  const [depth, setDepth] = useState('ط¹ظ…ظٹظ‚');
+  const [depth, setDepth] = useState('Deep');
   const [loading, setLoading] = useState(false);
   const [loadMsg, setLoadMsg] = useState('');
   const [error, setError] = useState('');
@@ -18,7 +18,7 @@ export default function Home() {
   const resultsRef = useRef(null);
 
   async function generate() {
-    if (!topic.trim()) { setError('ط£ط¯ط®ظ„ ط§ظ„ظ…ظˆط¶ظˆط¹ ط£ظˆظ„ط§ظ‹'); return; }
+    if (!topic.trim()) { setError('Please enter a topic first'); return; }
     setError(''); setResult(null); setLoading(true);
     let i = 0; setLoadMsg(MSGS[0]);
     timerRef.current = setInterval(() => { i = (i+1) % MSGS.length; setLoadMsg(MSGS[i]); }, 1500);
@@ -26,14 +26,14 @@ export default function Home() {
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ field, topic, style, location, audience: audience || 'ط¹ط§ظ…', depth })
+        body: JSON.stringify({ field, topic, style, location, audience: audience || 'General', depth })
       });
       const data = await res.json();
-      if (data.error) { setError('ط®ط·ط£: ' + data.error); return; }
+      if (data.error) { setError('Error: ' + data.error); return; }
       setResult(data);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch(e) {
-      setError('ط®ط·ط£: ' + e.message);
+      setError('Error: ' + e.message);
     } finally {
       clearInterval(timerRef.current);
       setLoading(false);
@@ -43,14 +43,17 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>ط£ط¯ط§ط© ط§ظ„ط¥ط¨ط¯ط§ط¹ ط§ظ„ط¨طµط±ظٹ</title>
+        <title>Creative Visual Tool</title>
+        <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </Head>
-
       <style>{`
         *{box-sizing:border-box;margin:0;padding:0}
         :root{--bg:#080B10;--s1:#0F1318;--s2:#161C24;--s3:#1E2530;--border:#ffffff12;--border2:#ffffff20;--gold:#C9A96E;--gold2:#E8C97E;--text:#F0EDE8;--text2:#9AA0B0;--text3:#555D6E}
-        body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Tahoma,Arial,sans-serif;min-height:100vh;direction:rtl}
+        body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
         .wrap{max-width:820px;margin:0 auto;padding:44px 24px 80px}
         .hdr{margin-bottom:40px;padding-bottom:28px;border-bottom:1px solid var(--border)}
         .hdr-tag{font-size:10px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:10px}
@@ -102,7 +105,7 @@ export default function Home() {
         .tag{padding:6px 13px;background:var(--s2);border:1px solid var(--border);border-radius:18px;font-size:12px;color:var(--text2)}
         .mb-title{font-size:9px;letter-spacing:2.5px;color:var(--text3);text-transform:uppercase;margin:28px 0 14px}
         .mb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-        .mb-img{aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:var(--s2);border:1px solid var(--border);position:relative}
+        .mb-img{aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:var(--s2);border:1px solid var(--border)}
         .mb-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
         .mb-img:hover img{transform:scale(1.04)}
         .mb-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);text-align:center;padding:8px}
@@ -113,15 +116,15 @@ export default function Home() {
       <div className="wrap">
         <div className="hdr">
           <div className="hdr-tag">Creative Visual Tool</div>
-          <h1>ط£ط¯ط§ط© <span>ط§ظ„ط¥ط¨ط¯ط§ط¹</span> ط§ظ„ط¨طµط±ظٹ</h1>
-          <p>ط£ظپظƒط§ط± طھطµظˆظٹط± ط§ط­طھط±ط§ظپظٹط© آ· طھط­ظ„ظٹظ„ ظپظ†ظٹ آ· Shot List آ· Color Palette آ· ظ…ط±ط§ط¬ط¹ ط¹ط§ظ„ظ…ظٹط© آ· Moodboard ط¨طµط±ظٹ</p>
+          <h1>Creative <span>Visual</span> Tool</h1>
+          <p>Professional ideas آ· Visual analysis آ· Shot List آ· Color Palette آ· Global References آ· Moodboard</p>
         </div>
 
         <div className="g3">
           {[
-            { label: 'ط§ظ„ظ…ط¬ط§ظ„', id: 'field', val: field, set: setField, opts: ['طھطµظˆظٹط± ظپظˆطھظˆط؛ط±ط§ظپظٹ','ط¥ظ†طھط§ط¬ ظپظٹظ„ظ…ظٹ','ط¨ط±ط§ظ†ط¯ ظˆظ‡ظˆظٹط© ط¨طµط±ظٹط©','ط¥ط¹ظ„ط§ظ† طھط¬ط§ط±ظٹ','ظپظٹط¯ظٹظˆ ظ…ظˆط³ظٹظ‚ظٹ','ظˆط«ط§ط¦ظ‚ظٹ'] },
-            { label: 'ط§ظ„ط³طھط§ظٹظ„', id: 'style', val: style, set: setStyle, opts: ['ط³ظٹظ†ظ…ط§ط¦ظٹ ط¯ط§ظƒظ†','ظپط§ط®ط± ظˆظ…طھط£ظ†ظ‚','ط¬ط±ظٹط، ظˆط¹طµط±ظٹ','ظ†ط§ط¹ظ… ظˆط­ط§ظ„ظ…','ط®ط§ظ… ظˆط­ظ‚ظٹظ‚ظٹ','ظ…ط³طھظ‚ط¨ظ„ظٹ طھظ‚ظ†ظٹ','طھط±ط§ط«ظٹ ظ…ط¹ط§طµط±'] },
-            { label: 'ط§ظ„ظ…ظˆظ‚ط¹', id: 'loc', val: location, set: setLocation, opts: ['ط§ظ„ط±ظٹط§ط¶','ط¬ط¯ط©','ظ†ظٹظˆظ…','ط§ظ„ط¯ط±ط¹ظٹط©','ط§ط³طھظˆط¯ظٹظˆ ظ…ط؛ظ„ظ‚','طµط­ط±ط§ط،','ط¨ط­ط± ظˆط³ط§ط­ظ„','ط¬ط¨ط§ظ„'] },
+            { label: 'Field', id: 'field', val: field, set: setField, opts: ['Photography','Film Production','Brand Identity','Commercial Ad','Music Video','Documentary'] },
+            { label: 'Style', id: 'style', val: style, set: setStyle, opts: ['Cinematic Dark','Luxury Elegant','Bold Modern','Soft Dreamy','Raw Authentic','Futuristic','Heritage Contemporary'] },
+            { label: 'Location', id: 'loc', val: location, set: setLocation, opts: ['Riyadh','Jeddah','NEOM','Diriyah','Studio','Desert','Coastal','Mountains'] },
           ].map(({ label, id, val, set, opts }) => (
             <div className="field" key={id}>
               <label>{label}</label>
@@ -134,36 +137,30 @@ export default function Home() {
 
         <div className="g2">
           <div className="field">
-            <label>ط§ظ„ظ…ظˆط¶ظˆط¹ / ط§ظ„ظپظƒط±ط©</label>
-            <input type="text" placeholder="ظ…ط«ط§ظ„: ظ‡ظˆظٹط© ط§ظ…ط±ط£ط© ط³ط¹ظˆط¯ظٹط© ظ…ط¹ط§طµط±ط©..." value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => e.key === 'Enter' && generate()} />
+            <label>Topic / Idea</label>
+            <input type="text" placeholder="e.g. Identity of a modern Saudi woman..." value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => e.key === 'Enter' && generate()} />
           </div>
           <div className="field">
-            <label>ط§ظ„ط¬ظ…ظ‡ظˆط±</label>
-            <input type="text" placeholder="ظ…ط«ط§ظ„: ط´ط¨ط§ط¨ 18-35..." value={audience} onChange={e => setAudience(e.target.value)} />
+            <label>Target Audience</label>
+            <input type="text" placeholder="e.g. Youth 18-35, Luxury market..." value={audience} onChange={e => setAudience(e.target.value)} />
           </div>
         </div>
 
         <div className="field" style={{ marginBottom: '16px' }}>
-          <label>ظ…ط³طھظˆظ‰ ط§ظ„ط¹ظ…ظ‚</label>
+          <label>Depth Level</label>
           <div className="depth-row">
-            {['ط¹ط§ط¯ظٹ','ط¹ظ…ظٹظ‚','ط§ط­طھط±ط§ظپظٹ ظ…طھط®طµطµ'].map(v => (
+            {['Basic','Deep','Expert'].map(v => (
               <button key={v} className={`db${depth === v ? ' on' : ''}`} onClick={() => setDepth(v)}>{v}</button>
             ))}
           </div>
         </div>
 
         <button className="run" disabled={loading} onClick={generate}>
-          {loading ? loadMsg : 'âœ¦ طھظˆظ„ظٹط¯ ط§ظ„ط£ظپظƒط§ط± ط§ظ„ط¥ط¨ط¯ط§ط¹ظٹط©'}
+          {loading ? loadMsg : 'âœ¦ Generate Creative Ideas'}
         </button>
 
         {error && <div className="err">{error}</div>}
-
-        {loading && (
-          <div className="loader">
-            <div className="ring"></div>
-            <div className="ltxt">{loadMsg}</div>
-          </div>
-        )}
+        {loading && <div className="loader"><div className="ring"></div><div className="ltxt">{loadMsg}</div></div>}
 
         {result && (
           <div className="results" ref={resultsRef}>
@@ -171,35 +168,23 @@ export default function Home() {
               <span className="res-topic">{topic}</span>
               <span className="res-meta">{field} / {style}</span>
             </div>
-
             {result.ideas?.length > 0 && (
               <div className="card">
-                <div className="clbl">ط£ظپظƒط§ط± ط¥ط¨ط¯ط§ط¹ظٹط©</div>
-                {result.ideas.map((x, i) => (
-                  <div className="idea" key={i}><span className="idea-n">0{i+1}</span><span>{x}</span></div>
-                ))}
+                <div className="clbl">Creative Ideas</div>
+                {result.ideas.map((x, i) => <div className="idea" key={i}><span className="idea-n">0{i+1}</span><span>{x}</span></div>)}
               </div>
             )}
-
-            {result.analysis && (
-              <div className="card">
-                <div className="clbl">طھط­ظ„ظٹظ„ ظپظ†ظٹ</div>
-                <div className="atxt">{result.analysis}</div>
-              </div>
-            )}
-
+            {result.analysis && <div className="card"><div className="clbl">Visual Analysis</div><div className="atxt">{result.analysis}</div></div>}
             <div className="two">
               {result.shotList?.length > 0 && (
                 <div className="card">
-                  <div className="clbl">ط²ظˆط§ظٹط§ ط§ظ„طھطµظˆظٹط±</div>
-                  {result.shotList.map((s, i) => (
-                    <div className="shot" key={i}><span className="shot-ic">â—ˆ</span><span>{s}</span></div>
-                  ))}
+                  <div className="clbl">Shot List</div>
+                  {result.shotList.map((s, i) => <div className="shot" key={i}><span className="shot-ic">â—ˆ</span><span>{s}</span></div>)}
                 </div>
               )}
               {result.references?.length > 0 && (
                 <div className="card">
-                  <div className="clbl">ظ…ط±ط§ط¬ط¹ ط¹ط§ظ„ظ…ظٹط©</div>
+                  <div className="clbl">Global References</div>
                   {result.references.map((r, i) => (
                     <div className="ref" key={i}>
                       <div className="ref-ic">âœ¦</div>
@@ -213,10 +198,9 @@ export default function Home() {
                 </div>
               )}
             </div>
-
             {(result.lighting || result.colorPalette?.length > 0) && (
               <div className="card">
-                <div className="clbl">ط¥ط¶ط§ط،ط© ظˆط£ظ„ظˆط§ظ†</div>
+                <div className="clbl">Lighting & Colors</div>
                 {result.lighting && <div className="ltxt2">{result.lighting}</div>}
                 {result.colorPalette?.length > 0 && (
                   <div className="swatches">
@@ -231,27 +215,20 @@ export default function Home() {
                 )}
               </div>
             )}
-
             {result.moodboardKeywords?.length > 0 && (
               <div className="card">
                 <div className="clbl">Moodboard Keywords</div>
-                <div className="tags">
-                  {result.moodboardKeywords.map((k, i) => <span className="tag" key={i}>{k}</span>)}
-                </div>
+                <div className="tags">{result.moodboardKeywords.map((k, i) => <span className="tag" key={i}>{k}</span>)}</div>
               </div>
             )}
-
             {result.unsplashTerms?.length > 0 && (
               <>
                 <div className="mb-title">Visual Moodboard</div>
                 <div className="mb-grid">
-                  {[...result.unsplashTerms, ...result.unsplashTerms, ...result.unsplashTerms].slice(0, 9).map((t, i) => (
+                  {[...result.unsplashTerms,...result.unsplashTerms,...result.unsplashTerms].slice(0,9).map((t,i) => (
                     <div className="mb-img" key={i}>
-                      <img
-                        src={`https://source.unsplash.com/600x450/?${encodeURIComponent(t)}&sig=${i}`}
-                        alt={t}
-                        onError={e => { e.target.parentNode.innerHTML = `<div class="mb-ph">${t}</div>`; }}
-                      />
+                      <img src={`https://source.unsplash.com/600x450/?${encodeURIComponent(t)}&sig=${i}`} alt={t}
+                        onError={e => { e.target.parentNode.innerHTML = `<div class="mb-ph">${t}</div>`; }} />
                     </div>
                   ))}
                 </div>
