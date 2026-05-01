@@ -3,10 +3,12 @@ export default async function handler(req, res) {
 
   const { field, topic, style, location, audience, depth } = req.body;
 
+  if (!topic) return res.status(400).json({ error: 'Topic is required' });
+  if (!process.env.ANTHROPIC_API_KEY) return res.status(500).json({ error: 'API key not configured' });
+
   const system = `You are a world-class director and photographer with 20 years of experience.
-Output ONLY valid JSON with no text outside it, exactly in this format:
-{"ideas":["","","","","",""],"analysis":"","shotList":["","","","",""],"lighting":"","colorPalette":[{"name":"","hex":"#000000","role":""},{"name":"","hex":"#000000","role":""},{"name":"","hex":"#000000","role":""},{"name":"","hex":"#000000","role":""}],"references":[{"name":"","work":"","why":""},{"name":"","work":"","why":""},{"name":"","work":"","why":""}],"moodboardKeywords":["","","","","","","",""],"unsplashTerms":["","",""]}
-Rules: unique non-cliche ideas, connect Saudi context to global references, every idea must be executable, no filler. unsplashTerms must be English words for image search.`;
+Output ONLY valid JSON, no markdown, no backticks, no extra text. Exactly this structure:
+{"ideas":["idea1","idea2","idea3","idea4","idea5","idea6"],"analysis":"deep analysis here","shotList":["shot1","shot2","shot3","shot4","shot5"],"lighting":"lighting description","colorPalette":[{"name":"Color Name","hex":"#C9A96E","role":"Primary"},{"name":"Color Name","hex":"#1A1A2E","role":"Background"},{"name":"Color Name","hex":"#E8E0D5","role":"Highlight"},{"name":"Color Name","hex":"#8B4513","role":"Accent"}],"references":[{"name":"Photographer Name","work":"Work Title","why":"Why relevant"},{"name":"Photographer Name","work":"Work Title","why":"Why relevant"},{"name":"Photographer Name","work":"Work Title","why":"Why relevant"}],"moodboardKeywords":["word1","word2","word3","word4","word5","word6","word7","word8"],"unsplashTerms":["search term 1","search term 2","search term 3"]}`;
 
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
@@ -27,10 +29,20 @@ Rules: unique non-cliche ideas, connect Saudi context to global references, ever
       })
     });
 
+    if (!r.ok) {
+      const errText = await r.text();
+      return res.status(500).json({ error: `Anthropic error ${r.status}: ${errText}` });
+    }
+
     const data = await r.json();
     const raw = data.content?.[0]?.text || '';
+
+    if (!raw) return res.status(500).json({ error: 'Empty response from AI' });
+
     const match = raw.match(/\{[\s\S]*\}/);
-    const parsed = JSON.parse(match ? match[0] : raw);
+    if (!match) return res.status(500).json({ error: 'No JSON found in response', raw });
+
+    const parsed = JSON.parse(match[0]);
     return res.status(200).json(parsed);
 
   } catch (e) {
